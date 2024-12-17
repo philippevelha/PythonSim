@@ -103,12 +103,13 @@ Contributions are welcome! Please submit pull requests or open issues to discuss
 
 ## License
 
-[Insert appropriate license - e.g., MIT, Apache 2.0]
+MIT (2024)
 
 ## Authors
 
-[Your Name or Organization]
+Philippe Velha, University of Trento
 
 ## Acknowledgments
 
-[Any specific acknowledgments or references]
+Next4EXA:  https://eurohpc-ju.europa.eu/net4exa-advancing-european-interconnect-hpc-and-ai-2024-12-13_en
+
