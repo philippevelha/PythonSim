@@ -6,18 +6,18 @@ import os
 
 # Define cache, memory, and accelerator properties
 
-Lmem = 100   # Latency for main memory in cycles
+Lmem = 400   # Latency for main memory in cycles
 L2mem = 50   # Latency for L2 cache in cycles
 L1mem = 5    # Latency for L1 cache in cycles
 Lregister = L1mem # Latency for buffer register near/inside DAC
-Lconversion = 20 # Latency for data conversion
+Lconversion = 2 # Latency for data conversion
 L2L1rateTransfer = 64 #bytes per cycle
 M = 16          # Minimum size of vector for accelerator
 Lacc = 2 + Lconversion  + Lregister   # Latency for accelerator dot product in cyclesLconversion of memory access
-L2_size = 2**16  # L2 cache size in bytes
-L1_size = 2**14  # L1 cache size in bytes
+L2_size = 10*1024**2 #2**16  # L2 cache size in bytes
+L1_size = 128*1024#2**14  # L1 cache size in bytes
 LoadingTimeL2L1 = L2mem*L1_size/L2L1rateTransfer # time to transfer from L2 to L1 x number of transfer
-float_size = 1  # Size of a float in bytes (assuming 32-bit float)
+float_size = 2  # Size of a float in bytes (assuming 32-bit float)
 pL1 = 0.001 # probability that the data is not in L1 and needs to be seek in L2
 
 parameters = {'L1mem':L1mem,'L2mem':L2mem,'Lmem':Lmem,'Lregister':Lregister,'Lconversion':Lconversion,'L2L1rateTransfer':L2L1rateTransfer,'Lacc':Lacc,'L2_size':L2_size,'L1_size':L1_size,'float_size':float_size,'pL1':pL1}
@@ -139,9 +139,10 @@ plt.loglog(list(results.keys()),list(results.values()),'--o')
 plt.show(block=False)
 plt.xlabel('Matrix Size [NxN]')
 plt.ylabel('Number of Cycles [#]')
+
 print("----------- STATISITCS -----------")
 
-NBstat = 10
+NBstat = 100
 data = []
 mm = []
 for ii in range(NBstat):
@@ -153,7 +154,7 @@ fig, axs = plt.subplots(nrows=2, ncols=2, figsize=(9, 4))
 axs[0][0].violinplot(data,
                   showmeans=True,
                   showmedians=True)
-axs[0][0].set_title('Violin plot')
+axs[0][0].set_title('Compute Time [cycles]')
 
 # plot box plot
 axs[0][1].boxplot(data)
@@ -162,7 +163,7 @@ axs[0][1].set_title('Box plot')
 axs[1][0].violinplot(mm,
                   showmeans=True,
                   showmedians=True)
-axs[1][0].set_title('Violin plot')
+axs[1][0].set_title('Miss number')
 
 # plot box plot
 axs[1][1].boxplot(mm)

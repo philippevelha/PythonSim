@@ -1,19 +1,20 @@
 import numpy as np
 import time
 from math import ceil
+import matplotlib.pyplot as plt
 
 # Define cache and memory properties
-Lmem = 100   # Latency for main memory in cycles
-L2mem = 10   # Latency for L2 cache in cycles
-L1mem = 4    # Latency for L1 cache in cycles
-L2_size = 2**16  # L2 cache size in bytes
-L1_size = 2**12  # L1 cache size in bytes
+Lmem = 400   # Latency for main memory in cycles
+L2mem = 50   # Latency for L2 cache in cycles
+L1mem = 5    # Latency for L1 cache in cycles
+L2_size = 10*1024**2  # L2 cache size in bytes
+L1_size = 16*1024  # L1 cache size in bytes
 float_size = 4   # Size of a float in bytes (assuming 32-bit float)
 MACop = 3 #Time to perform a MAC operation in cycles depending can go up to 5 or 6
 
 def compute_time_with_tiling_parallel(N, K):
     # Determine tile size based on L1 cache size
-    tile_elements = L1_size // float_size  # Max elements in a tile for L1 cache
+    tile_elements = L1_size // K  # Max elements in a tile for L1 cache
     tile_size = int(np.sqrt(tile_elements))  # Tile dimension (tile_size x tile_size)
 
     # Initialize matrices A and B
@@ -76,7 +77,7 @@ def compute_time_with_tiling_parallel(N, K):
     return total_time, accessmemL1, accessmemL2, op
 
 # Run simulation for different matrix sizes and parallel factors
-matrix_sizes = [16,32,64, 128, 256, 512]  # Test for different values of N
+matrix_sizes = [16,32,64, 128,256, 512]  # Test for different values of N
 parallel_factors = [2, 4, 8]   # Test for different values of K
 results = {}
 
@@ -89,3 +90,36 @@ for N in matrix_sizes:
         print(f"Matrix Size: {N}x{N}, Parallel Factor K={K}, Computation Time with Tiling (cycles): {total_time}, Elapsed Time: {end_time - start_time:.4f} seconds")
         print(f"Matrix Size: {N}x{N}, Parallel Factor K={K}, memory access L1: {accessmemL1}, memory access L2: {accessmemL2}, number of op: {op}")
         print(f"Matrix Size: {N}x{N}, Parallel Factor K={K}, computing intensity:{op/total_time} in op/cycle")             
+
+
+
+# Extract data for each second value
+data_2 = {key[0]: value for key, value in results.items() if key[1] == 2}
+data_4 = {key[0]: value for key, value in results.items() if key[1] == 4}
+data_8 = {key[0]: value for key, value in results.items() if key[1] == 8}
+
+# Create lists for plotting
+x_values = sorted(list(data_2.keys()))  # [16, 32, 64, 128]
+y_values_2 = [data_2[x] for x in x_values]
+y_values_4 = [data_4[x] for x in x_values]
+y_values_8 = [data_8[x] for x in x_values]
+
+# Create the plot
+plt.figure(figsize=(10, 6))
+plt.plot(x_values, y_values_2, 'o-', label='K = 2', linewidth=2, markersize=8)
+plt.plot(x_values, y_values_4, 's-', label='K = 4', linewidth=2, markersize=8)
+plt.plot(x_values, y_values_8, '^-', label='K = 8', linewidth=2, markersize=8)
+
+# Customize the plot
+plt.xlabel('Matrix Size [NxN]')
+plt.ylabel('Number of cycles')
+plt.title('Performance Comparison')
+plt.grid(True, linestyle='--', alpha=0.7)
+plt.legend()
+
+# Use logarithmic scale for better visualization
+plt.xscale('log', base=2)
+plt.yscale('log', base=10)
+
+
+plt.show(block=True)
